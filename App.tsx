@@ -1,10 +1,36 @@
+import axios from 'axios';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+
 export default function App() {
+
+  const opts: any = {};
+  const { continuation, size = 10 } = opts;
+  const fetchTokenInfo = async (owner, opts) => {
+  try {
+    const result = await axios.get('https://api.rarible.com/protocol/v0.1/ethereum/nft/items/all', {
+      params: { owner, continuation }, 
+    });
+    const { data } = result;
+
+    // Paginate results
+    let hist = [];
+    if (data.continuation && data.items.length === size) {
+      hist = await fetchTokenInfo(owner, { ...opts, continuation: data.continuation });
+    }
+
+    // Return full history
+    return [...data.items, ...hist];
+  } catch (err) {
+    console.error(err);
+    return [];
+  }
+};
+
   return (
     <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
+      <Text>Noopster!{fetchTokenInfo}</Text>
     </View>
   );
 }
