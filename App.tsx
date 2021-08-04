@@ -4,20 +4,20 @@ import { StyleSheet, Text, View } from 'react-native';
 
 
 export default function App() {
-
+  const axios = require("axios");
   const opts: any = {};
   const { continuation, size = 10 } = opts;
-  const fetchTokenInfo = async (owner, opts) => {
+  const fetchTokenInfo = async (items, opts) => {
   try {
     const result = await axios.get('https://api.rarible.com/protocol/v0.1/ethereum/nft/items/all', {
-      params: { owner, continuation }, 
+      params: { items, continuation }, 
     });
     const { data } = result;
 
     // Paginate results
     let hist = [];
     if (data.continuation && data.items.length === size) {
-      hist = await fetchTokenInfo(owner, { ...opts, continuation: data.continuation });
+      hist = await fetchTokenInfo(items, { ...opts, continuation: data.continuation });
     }
 
     // Return full history
@@ -43,3 +43,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
